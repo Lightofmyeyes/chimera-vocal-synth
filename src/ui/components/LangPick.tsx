@@ -3,7 +3,8 @@ import { Chip } from "./Screen.tsx";
 
 const LANGS: { value: Lang; label: string; name: string }[] = [
   { value: "en", label: "EN", name: "English" },
-  { value: "tr", label: "TR", name: "Turkish" },
+    { value: "tr", label: "TR", name: "Turkish" },
+    { value: "pt", label: "PT", name: "Portuguese" },
 ];
 
 /** The language typed words are read in: two chips for a screen's tools. `off` lights neither (IPA input). */

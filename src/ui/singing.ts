@@ -81,7 +81,7 @@ function kept(): { lyrics: string; lang: Lang; tune: string; tempo: number; key:
     if (!k) return d;
     return {
       lyrics: typeof k.lyrics === "string" ? k.lyrics : d.lyrics,
-      lang: k.lang === "tr" ? "tr" : d.lang,
+      lang: k.lang === "tr" || k.lang === "pt" ? k.lang : d.lang,
       tune: TUNES.some((t) => t.id === k.tune) ? (k.tune as string) : d.tune,
       tempo: typeof k.tempo === "number" && k.tempo >= 0.5 && k.tempo <= 1.5 ? k.tempo : d.tempo,
       key: typeof k.key === "number" && Math.abs(k.key) <= 12 ? Math.round(k.key) : d.key,

@@ -169,6 +169,14 @@ export function turkishPhrases(text: string): Phrase[] {
   return call("trPhrases", { text });
 }
 
+/**
+ * Brazilian Portuguese text → phrases of segments. Its spelling rules are the G2P, so there is no
+ * dictionary to load (crates/chimera/src/phonetics/portuguese.rs).
+ */
+export function portuguesePhrases(text: string): Phrase[] {
+  return call("ptPhrases", { text }) as Phrase[];
+}
+
 // ------------------------------------------------------------------ planning
 
 export interface PlanOptions {
