@@ -53,17 +53,19 @@ Brazilian Portuguese has seven pure vowels and three nasal ones:
 
 | spelling | sound | in |
 |---|---|---|
-| a | [a] open, [ɐ] closed | open: lá [ˈla]; closed: casa [ˈkazɐ] (unstressed before a nasal or at the end) |
-| e | [e] open, [ɛ] closed | mesa [ˈmezɐ], porta [ˈpɔʁtɐ] |
-| i | [i] | |
-| o | [o] open, [ɔ] closed | porta [ˈpɔʁtɐ] |
+| a | [a] open front; [ɐ] open-mid central | stressed: lá [ˈla]; unstressed: casa [ˈkazɐ] (before a nasal or at the end) |
+| e | [e] close-mid front; [ɛ] open-mid front | mesa [ˈmezɐ], porta [ˈpɔʁtɐ] |
+| i | [i] close front | |
+| o | [o] close-mid back; [ɔ] open-mid back | porta [ˈpɔʁtɐ] |
 | u | [u], and [w] as a glide | água [ˈaɡwa] |
 | ã | [ɐ̃] | pão, irmã |
 | õ | [õ] | então, coração |
 
-The **closed** vowels (ɐ ɛ ɔ) are the unstressed ones in a closed syllable (`mesa`), and the
-word-final ones (`casa`); a stressed vowel stays open (`mar` [maʁ], `café` [kaˈfe]). An
-unstressed final /o/ rises to [u] (`copo` [ˈkɔpu], `sapato` [saˈpatu]).
+The **unstressed** vowels are [ɐ] (open-mid central — the Brazilian near-open central), [ɛ]
+(open-mid front) and [ɔ] (open-mid back): they are the vowels of an open syllable and of a
+word-final unstressed syllable (`mesa` [ˈmezɐ], `porta` [ˈpɔʁtɐ], `casa` [ˈkazɐ]). A stressed
+vowel keeps its close or close-mid form (`mar` [maʁ], `café` [kaˈfe]). An unstressed final
+/o/ rises to [u] (`copo` [ˈkɔpu], `sapato` [saˈpatu]).
 
 **Nasal vowels need no new phoneme.** The engine already nasalises a vowel with a combining
 tilde (`ipa.rs`): `a` + U+0303 is [ɐ̃]. The rule is the whole change. A vowel before a nasal in
@@ -109,7 +111,7 @@ work:
 | [ʎ] (lh), [ɲ] (nh) | ✓ `inventory.rs` |
 | [β] (v), [ɾ] [ɽ] (the tapping r) | ✓ `inventory.rs` |
 | [tʃ] [dʒ] (ti, di) | ✓ `inventory.rs` |
-| [ɐ] [ɛ] [ɔ] (the closed vowels) | ✓ the vowel set |
+| [ɐ] [ɛ] [ɔ] (the unstressed vowels) | ✓ the vowel set |
 | nasal vowels | ✓ the combining tilde (U+0303) — a rule, not a new phoneme |
 
 **Nothing needs to be added to the engine.** This is why the Portuguese front end is the same
@@ -146,7 +148,7 @@ current output byte for byte — the same promise the Turkish front end made. Th
 | the nasal diphthong | `pão` → [pɐ̃w̃] |
 | the r of *Português* | `Português` → [poʁtuˈɡeʃ] |
 | the tapping r | `carioca` → [kaɾiˈoka] |
-| the closed vowels | `casa` → [ˈkazɐ] |
+| the unstressed vowels | `casa` → [ˈkazɐ] |
 | ti/di | `tia` → [ˈtʃiɐ] |
 | lh and nh | `filho` → [ˈfiʎu], `unha` → [ˈuɲɐ] |
 | x and ç | `chave` → [ˈʃavi], `braço` → [ˈbɾasɨu] |
