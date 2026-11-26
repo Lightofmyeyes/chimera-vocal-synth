@@ -20,6 +20,7 @@ usage: chimera <command> [args] [--float]
   render speech  <out> [\"ipa / ipa\"] [male|female|child]
   render text    <out> [\"English text.\"] [male|female|child]
   render turkish <out> [\"Türkçe metin.\"] [male|female|child]
+  render portuguese <out> [\"Texto brasileiro.\"] [male|female|child]
   render song    [outdir] [male|female|child]
   render notes   <in.json> <out> [male|female|child] [--artic tracks.json] [--tele voice.tele]
                  (melody file; midi <= 0 is a rest; \"lang\": \"tr\" reads Latin-script lyrics as Turkish;
