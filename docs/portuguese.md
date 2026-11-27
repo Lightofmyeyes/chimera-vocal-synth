@@ -10,10 +10,13 @@ still go to their own front ends.
 `crates/chimera/src/phonetics/portuguese.rs` reads the spelling by rule, with no dictionary, onto
 the existing inventory (**no new sounds** — see [O inventário](#o-inventário-measure-2026-11-25)).
 
-> **Status: the front end is here** — the rules below are what it does, and the tests in
-> `crates/chimera/tests/portuguese.rs` are what hold it to them. A native speaker's check is still
-> wanted on the vowel quality and on the stress of the endings: they are the parts that most need
-> an ear.
+> **Status: the front end is here, and it has been heard.** The rules below are what it does, and
+> the tests in `crates/chimera/tests/portuguese.rs` are what hold it to them. The native check was
+> done by **Eloisa de Arau**, a Brazilian native speaker, on 26 November 2026: she listened to a
+> rendered file of the words and phrases below and wrote her verdict on it. Her ear changed seven
+> rules (the [v], the palatal affricates, the word-final *e*, the coda *l*, the word-final *s*,
+> the stress of the endings and the *-mente*), and each rule now has a test that holds it to the
+> IPA she agreed with.
 
 ## Writing it
 
@@ -25,26 +28,33 @@ the existing inventory (**no new sounds** — see [O inventário](#o-inventário
   way.
 - Numbers are read out in Speak ("1.923,5" → "mil novecentos e vinte e três vírgula cinco").
 
+**The accent this front end follows.** Standard Brazilian Portuguese, the way São Paulo speaks it,
+with the Rio tap [ɾ] for the intervocalic *r* (the one difference the ear left alone). The points
+where the regions part company — the final *s*, the final nasal, the *r* — are named in
+[The known approximations](#the-known-approximations).
+
 ## What it does
 
 | | |
 |---|---|
-| v | [β] between vowels, [v] elsewhere: você [voˈse], livro [ˈlivɾu] |
+| v | [v] everywhere: nova [ˈnovɐ], você [voˈsɛ] |
 | r at the start of a word, after n or l, doubled, before a consonant or at the end of a word | the uvular fricative [ʁ]: real [ʁeˈaw], obrigado [obɾiˈɡadu], Português [poʁtuˈɡeʃ] |
 | r in the onset before a vowel | the tap [ɾ]: carioca [kaɾiˈoka], braço [ˈbɾasɨu] |
 | lh | [ʎ]: filho [ˈfiʎu] |
 | nh | [ɲ]: unha [ˈuɲɐ] |
 | ll | [ʎ], like lh (the usual Brazilian reading) |
-| ti, di | the palatal affricates [tʃ], [dʒ]: tia [ˈtʃiɐ], dia [ˈdʒiɐ] |
+| t, d before [i] | the palatal affricates [tʃ], [dʒ]: tia [ˈtʃiɐ], noite [ˈnojtʃi], tarde [ˈtaʁdʒi] |
+| t, d before a sounded [e ɛ] | the plain [t] and [d]: tempo [ˈtẽpu], tela [ˈtɛlɐ] |
 | x | [ʃ]: chave [ˈʃavi] |
 | ç | [s]: braço [ˈbɾasɨu] |
 | h | silent: homem [oˈmẽj̃] |
 | gu before e or i | [ɡ], the u silent: guerra [ˈɡɛʁɐ] |
 | qu | [k]: quinze [ˈkĩzɪ] |
 | ão, õe, ãi, õi | the nasal diphthongs, one nucleus: pão [pɐ̃w̃], mãe [ˈmɐ̃j̃], coração [koɾɐˈsɐ̃w̃] |
-| s between vowels, and at the end of a word | [z]: casa [ˈkazɐ], livros [ˈlivɾuz] |
-| s before a consonant | [s]: sapato [saˈpatu] |
-| a final s after a front vowel | [s]: três [tɾɛs] |
+| ai, ei, oi, au, eu, ou | the plain diphthongs, one nucleus with a glide: pai [ˈpaj], noite [ˈnojtʃi], meu [ˈmew] |
+| l in the coda | [w]: alto [ˈawtu], calma [ˈkawmɐ] |
+| s between vowels | [z]: asas [ˈazɐz] |
+| s everywhere else, the word-final s included | [s]: sapato [saˈpatu], casas [ˈkazɐs] |
 | nasals before a consonant | the nasal is a coda and the consonant moves to the next syllable: bom dia [bõŋˈdʒiɐ] |
 
 ### The vowels
@@ -53,8 +63,8 @@ Brazilian Portuguese has seven pure vowels and three nasal ones:
 
 | spelling | sound | in |
 |---|---|---|
-| a | [a] open front; [ɐ] open-mid central | stressed: lá [ˈla]; unstressed: casa [ˈkazɐ] (before a nasal or at the end) |
-| e | [e] close-mid front; [ɛ] open-mid front | mesa [ˈmezɐ], porta [ˈpɔʁtɐ] |
+| a | [a] open front; [ɐ] open-mid central | stressed: mar [ˈmaʁ]; a monosyllable closes it: já [ʒˈɐ]; unstressed: casa [ˈkazɐ] (before a nasal or at the end) |
+| e | [e] close-mid front; [ɛ] open-mid front | mesa [ˈmezɐ], porta [ˈpɔʁtɐ]; a word-final unstressed *e* is [i]: fome [ˈfomi] |
 | i | [i] close front | |
 | o | [o] close-mid back; [ɔ] open-mid back | porta [ˈpɔʁtɐ] |
 | u | [u], and [w] as a glide | água [ˈaɡwa] |
@@ -65,7 +75,9 @@ The **unstressed** vowels are [ɐ] (open-mid central — the Brazilian near-open
 (open-mid front) and [ɔ] (open-mid back): they are the vowels of an open syllable and of a
 word-final unstressed syllable (`mesa` [ˈmezɐ], `porta` [ˈpɔʁtɐ], `casa` [ˈkazɐ]). A stressed
 vowel keeps its close or close-mid form (`mar` [maʁ], `café` [kaˈfe]). An unstressed final
-/o/ rises to [u] (`copo` [ˈkɔpu], `sapato` [saˈpatu]).
+/o/ rises to [u] (`copo` [ˈkɔpu], `sapato` [saˈpatu]), and a word-final unstressed /e/ is [i]
+(`fome` [ˈfomi], `dente` [ˈdẽntʃi]). A stressed /a/ in a monosyllable closes as well (`já`
+[ʒˈɐ], `lá` [ˈlɐ]).
 
 **Nasal vowels need no new phoneme.** The engine already nasalises a vowel with a combining
 tilde (`ipa.rs`): `a` + U+0303 is [ɐ̃]. The rule is the whole change. A vowel before a nasal in
@@ -82,13 +94,16 @@ respect it and to know the defaults when the accent is absent.
    `coração` → [koɾɐˈsɐ̃w̃]. A circumflex before that nasal marks the nasalisation and not the
    stress (`bênção` → [bẽˈsɐ̃w̃]).
 3. **No accent: stress the penult.** `casa` → [ˈkazɐ]; `Português` → [poʁtuˈɡeʃ]; `livros` →
-   [ˈlivɾuz].
-4. **The ending -mente keeps the stress of the stem and adds its own**: `rapidamente` →
-   [ʁapiˈdamẽtʃi].
-5. **The verb endings carry their own stress**: -ei, -ou (falei [faˈlei], falou [faˈlou]); the
-   future -ia, -iam (falaria [faˈlaɾiɐ], falariam [faˈlaɾiɐ̃m]); and a word ending in a final r
-   (falar [faˈlaʁ], andar [ɐ̃ˈdaʁ]). A participle (-ado, -ido) takes the penult like any other
-   word (`falado` → [faˈladu], `obrigado` → [obɾiˈɡadu]).
+   [ˈlivɾuz]. The words that end in a closed syllable Portuguese writes oxytone fall on that
+   last syllable instead: a final *r* (`falar` [faˈlaʁ], `andar` [ɐ̃ˈdaʁ]) and the endings
+   *l, z, i, u, im, um, ns* (`Brasil` [bɾaˈziw], `feliz` [feˈliz], `aqui` [aˈki], `comum`
+   [koˈmũm]).
+4. **The ending -mente carries the stress**: `rapidamente` → [ʁapidaˈmɛ̃ntʃi].
+5. **The verb endings carry their own stress**: -ei, -ou (falei [faˈlej], falou [faˈlow]); the
+   future -ia, -iam, which fall on the antepenult — or on the penult in the short words
+   (`Maria` [maˈɾiɐ], `falava` [faˈlavɐ], `falaria` [faˈlaɾiɐ], `academia` [akaˈdɛmiɐ]). A
+   participle (-ado, -ido) takes the penult like any other word (`falado` → [faˈladu],
+   `obrigado` → [obɾiˈɡadu]).
 6. **Monosyllables** take their default: `cor` [kɔʁ], `pôr` [poʁ], `saú` [saˈu].
 
 ### The syllables
@@ -146,26 +161,46 @@ current output byte for byte — the same promise the Turkish front end made. Th
 | what | example |
 |---|---|
 | the nasal diphthong | `pão` → [pɐ̃w̃] |
+| the plain diphthong | `pai` → [ˈpaj], `meu` → [ˈmew] |
 | the r of *Português* | `Português` → [poʁtuˈɡeʃ] |
 | the tapping r | `carioca` → [kaɾiˈoka] |
 | the unstressed vowels | `casa` → [ˈkazɐ] |
-| ti/di | `tia` → [ˈtʃiɐ] |
+| ti/di, and the *t*/*d* before a sounded [e ɛ] | `tia` → [ˈtʃiɐ], `noite` → [ˈnojtʃi], `tempo` → [ˈtẽpu] |
+| the [v], the coda [l], the final [s] | `nova` → [ˈnovɐ], `alto` → [ˈawtu], `casas` → [ˈkazɐs] |
+| the word-final unstressed *e* | `fome` → [ˈfomi], `dente` → [ˈdẽntʃi] |
+| the oxytone endings and the -ia ending | `Brasil` → [bɾaˈziw], `comum` → [koˈmũm], `Maria` → [maˈɾiɐ] |
+| the stress of -mente | `rapidamente` → [ʁapidaˈmɛ̃ntʃi] |
 | lh and nh | `filho` → [ˈfiʎu], `unha` → [ˈuɲɐ] |
 | x and ç | `chave` → [ˈʃavi], `braço` → [ˈbɾasɨu] |
 | gu before e/i | `guerra` → [ˈɡɛʁɐ] |
-| the stress rules | `café` → [kaˈfe], `casa` → [ˈkazɐ], `sapato` → [saˈpatu], `rapidamente` → [ʁapiˈdamẽtʃi] |
+| the stress rules | `café` → [kaˈfe], `casa` → [ˈkazɐ], `sapato` → [saˈpatu] |
 | the numbers | `1.923,5` → "mil novecentos e vinte e três vírgula cinco" |
 | Latin script is Portuguese only when chosen | (the test `turkish.rs` has for Turkish) |
 | every sound is in the inventory | the front end never asks for a sound the engine doesn't have |
 | English is untouched | the English tests still pass, byte for byte |
 
-## The check that is still wanted
+## The check that was done, and what it changed
 
-The **vowel quality** and the **stress of the endings** are the parts that most need an ear: the
-difference between *café* and *café* is not visible in the code, it is audible in the voice. A
-native speaker's check of the closed-vowel rule — and of where the stress falls in the less
-common endings — is what this front end is missing before it can sing a Brazilian lyric with pride.
+The **vowel quality** and the **stress of the endings** are the parts that need an ear: the
+difference between *café* and *café* is not visible in the code, it is audible in the voice. On 26
+November 2026 **Eloisa de Arau** listened to a rendered file of the words and phrases above and
+wrote her verdict on it. Seven rules changed with it, and each one now has a test:
 
-Two known approximations, both left for that ear: a word-final nasal is [m] or [n] and not the
-[j̃] most speakers use (`homem` [ˈomẽm]), and an intervocalic r is the tap [ɾ] (Rio) and not the
-uvular [ʁ] (São Paulo).
+| what she heard | what it became |
+|---|---|
+| the *v* of *nova* was not a Brazilian [v] | [v] everywhere |
+| the *t* and *d* changed before every *e* | they change before [i] only |
+| the word-final *e* sounded like [ɛ] | it is [i] |
+| the *l* of *alto* was a tap | a coda [w] |
+| the final *s* sounded like [z] | it is [s] before a pause |
+| *Maria*, *academia* and *Brasil* fell on the wrong syllable | the oxytone endings and the -ia ending |
+| *rapidamente* stressed the stem | -mente carries the stress |
+
+## The known approximations
+
+Three things this front end still reads by rule where a speaker would vary:
+
+- a word-final nasal is [m] or [n] and not the [j̃] most speakers use (`homem` [ˈomẽm]);
+- an intervocalic *r* is the tap [ɾ] (Rio) and not the uvular [ʁ] (São Paulo);
+- a word-final *s* is [s] everywhere, and not the [z] it takes before a vowel of the next word
+  (`casas e árvores` [ˈkazɐz...]) — the reader works word by word and cannot see the boundary.

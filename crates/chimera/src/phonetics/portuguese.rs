@@ -5,19 +5,26 @@
 //! - **the three r's**: [ʁ] in the onset (at the start of a word, after n or l) and in the coda
 //!   (before a consonant or at the end of a word), [ɾ] between vowels: "Português" [poʁtuˈɡeʃ],
 //!   "carioca" [kaɾiˈoka], "mar" [maʁ].
-//! - **the s**: [z] before a vowel and at the end of a word, [s] before a consonant: "casa"
-//!   [ˈkazɐ], "passo" [ˈpasu].
-//! - **the v**: [β] between vowels, [v] elsewhere: "você" [βuˈsɛ].
-//! - **the l**: [w] at the end of a word after a vowel, [ɾ] before a consonant: "Brasil"
-//!   [bɾaˈziw].
+//! - **the s**: [z] between vowels, [s] everywhere else, the word-final s included: "asa"
+//!   [ˈazɐ], "casas" [ˈkazɐs].
+//! - **the v**: [v] everywhere: "nova" [ˈnovɐ], "você" [voˈsɛ].
+//! - **the l**: [w] in the coda, before a consonant or at the end of a word after a vowel: "alto"
+//!   [ˈawtu], "calma" [ˈkawmɐ]. Before a vowel it is [l]: "falar" [faˈlaʁ].
+//! - **the t and the d**: [tʃ] and [dʒ] before [i] — the letter "i" and the word-final
+//!   unstressed "e" ("noite" [ˈnojtʃi], "tarde" [ˈtaʁdʒi]); before a sounded [e ɛ] they
+//!   stay [t] and [d]: "tempo" [ˈtẽpu], "tela" [ˈtɛlɐ].
 //! - **the nasal diphthongs**: ão, ãi, õe, õi are one nucleus: "pão" [pɐ̃w̃], "mãe" [mɐ̃j̃].
-//! - **the closed vowels**: an unstressed /a e o/ in a closed syllable, and a word-final one, are
-//!   the short central [ɐ ɛ ɔ]: "casa" [ˈkazɐ], "mesa" [ˈmezɐ].
+//! - **the plain diphthongs** are one nucleus as well, with a glide: "pai" [ˈpaj], "noite"
+//!   [ˈnojtʃi], "meu" [ˈmew].
+//! - **the unstressed vowels**: an unstressed /a e o/ in a closed syllable, and a word-final one,
+//!   are the near-open central [ɐ] and the open mid [ɛ ɔ]: "casa" [ˈkazɐ], "mesa" [ˈmɛzɐ].
+//! - **the word-final unstressed e**: [i], not [ɛ]: "fome" [ˈfomi], "dente" [ˈdẽntʃi].
 //!
 //! Stress is written, which makes this front end's job easier than English's: a written accent
-//! wins; a word ending in a nasal vowel falls on that vowel; a few endings carry their own
-//! stress (-ei, -ou, -ado, -ido, -ia); and everything else falls on the penult: "café" [kaˈfe],
-//! "casa" [ˈkazɐ], "sapato" [saˈpatu], "rapidamente" [ʁapiˈdamẽtʃi].
+//! wins; a word ending in a nasal vowel falls on that vowel; the endings -ei, -ou and -mente
+//! carry their own stress; a word ending in a closed syllable (l, z, i, u, im, um, ns) falls on
+//! it; and everything else falls on the penult: "café" [kaˈfe], "casa" [ˈkazɐ], "sapato"
+//! [saˈpatu], "Brasil" [bɾaˈziw], "rapidamente" [ʁapidaˈmɛ̃ntʃi].
 //!
 //! The nasal vowels need no new phoneme: the engine nasalises a vowel with a combining tilde
 //! (`ipa.rs`), so /ã/ is a rule and not a sound.
@@ -99,6 +106,18 @@ fn front_vowel_at(w: &[char], i: usize) -> bool {
     w.get(i).is_some_and(|c| matches!(base_vowel(*c), 'e' | 'i'))
 }
 
+/// Whether the letter at `i` is the [i] that the palatal affricates change before: the letter
+/// "i", or a word-final unstressed "e" — which is read [i] ("noite", "tarde", "dente"). A sounded
+/// [e ɛ] keeps the plain [t] and [d] ("tempo", "dedo", "tela").
+fn palatal_before(w: &[char], i: usize) -> bool {
+    let Some(&c) = w.get(i) else { return false };
+    let base = base_vowel(c);
+    if base == 'i' {
+        return true;
+    }
+    base == 'e' && i + 1 == w.len() && !is_accent_letter(c)
+}
+
 /// The sounds of a consonant letter or digraph at `i`, and how many letters they use.
 fn consonants(w: &[char], i: usize) -> (Vec<&'static str>, usize) {
     let c = w[i];
@@ -125,10 +144,10 @@ fn consonants(w: &[char], i: usize) -> (Vec<&'static str>, usize) {
         'n' if next == Some('h') => (vec!["ɲ"], 2),
         'l' if next == Some('l') => (vec!["ʎ"], 2),
         'c' => (if front_vowel_at(w, i + 1) { vec!["s"] } else { vec!["k"] }, 1),
-        'd' => (if front_vowel_at(w, i + 1) { vec!["dʒ"] } else { vec!["d"] }, 1),
+        'd' => (if palatal_before(w, i + 1) { vec!["dʒ"] } else { vec!["d"] }, 1),
         // "ti" and "di" are the palatal affricates of most of Brazil
         't' => {
-            if front_vowel_at(w, i + 1) {
+            if palatal_before(w, i + 1) {
                 (vec!["tʃ"], 1)
             } else if i >= 2 && is_mente_tail(w, i - 2) {
                 // the "te" of "-mente" is read [tʃi]
@@ -148,35 +167,30 @@ fn consonants(w: &[char], i: usize) -> (Vec<&'static str>, usize) {
         'n' => (vec!["n"], 1),
         'p' => (vec!["p"], 1),
         's' => {
-            // [z] between vowels and at the end of a word, [s] elsewhere
+            // [z] between vowels, [s] everywhere else — the word-final s included: before a pause
+            // it is [s] ("casas" [ˈkazɐs]); [z] belongs before a vowel or a voiced consonant
+            // across a word boundary, which a word-by-word reader cannot see.
             let between = vowel_at(w, i + 1) && i > 0 && is_vowel_letter(w[i - 1]);
-            let final_s = i + 1 == w.len();
-            // after a front vowel the final s stays [s] ("três", "vocês")
-            let after_front = final_s && i > 0 && matches!(base_vowel(w[i - 1]), 'e' | 'i');
-            if between || (final_s && !after_front) {
+            if between {
                 (vec!["z"], 1)
             } else {
                 (vec!["s"], 1)
             }
         }
         'v' => {
-            // [β] between vowels, [v] elsewhere
-            let between = vowel_at(w, i + 1) && i > 0 && is_vowel_letter(w[i - 1]);
-            if between {
-                (vec!["β"], 1)
-            } else {
-                (vec!["v"], 1)
-            }
+            // Portuguese keeps [v] everywhere — the [β] of the Spanish b/v is not ours
+            (vec!["v"], 1)
         }
         'w' => (vec!["w"], 1),
         'z' => (vec!["z"], 1),
         'l' => {
-            // [w] at the end of a word after a vowel, [ɾ] before a consonant
+            // a coda l is [w]: before a consonant ("alto" [ˈawtu]) or at the end of a word after a
+            // vowel ("calma" [ˈkawmɐ]); before a vowel it is [l] ("falar")
             let after_vowel = i > 0 && is_vowel_letter(w[i - 1]);
-            if i + 1 == w.len() && after_vowel {
+            if i + 1 < w.len() && !vowel_at(w, i + 1) {
                 (vec!["w"], 1)
-            } else if !vowel_at(w, i + 1) && i + 1 < w.len() {
-                (vec!["ɾ"], 1)
+            } else if i + 1 == w.len() && after_vowel {
+                (vec!["w"], 1)
             } else {
                 (vec!["l"], 1)
             }
@@ -233,6 +247,24 @@ fn scan(w: &[char]) -> Vec<Phone> {
                         _ => "u",
                     };
                     out.push(Phone::nucleus(format!("{vowel}{NASAL}{glide}"), n, i, i + 2, true, false));
+                    n += 1;
+                    i += 2;
+                    continue;
+                }
+            }
+            // the plain diphthongs are one nucleus too: ai, ei, oi take a [j] glide, and au, eu,
+            // ou a [w] ("pai" [ˈpaj], "noite" [ˈnojtʃi], "meu" [ˈmew]). An accented vowel is
+            // never part of one ("saída" [saˈidɐ]) — it carries the stress of its own.
+            if !nasal && !is_accent_letter(c) {
+                let next_vowel = w.get(i + 1).copied().filter(|v| is_vowel_letter(*v) && !is_accent_letter(*v));
+                let glide = match (base, next_vowel) {
+                    ('a' | 'e' | 'o', Some('i')) => Some("j"),
+                    ('a' | 'e' | 'o', Some('u')) => Some("w"),
+                    ('u', Some('i')) => Some("j"),
+                    _ => None,
+                };
+                if let Some(glide) = glide {
+                    out.push(Phone::nucleus(format!("{base}{glide}"), n, i, i + 2, false, false));
                     n += 1;
                     i += 2;
                     continue;
@@ -307,11 +339,13 @@ fn syllables(w: &[char], phones: &[Phone]) -> Vec<(usize, usize, usize)> {
 }
 
 /// The endings that carry their own stress, and how far from the end of the word the stressed
-/// nucleus is (1 = the last one). A word ending in a final r falls on it ("falar", "andar");
-/// "-mente" is a rule of its own, above.
+/// nucleus is (1 = the last one). A word ending in a final r falls on it ("falar", "andar"), and
+/// so does a word ending in a closed syllable that Portuguese writes oxytone ("Brasil",
+/// "feliz", "aqui", "comum"); "-mente" and "-ia" are rules of their own, above.
 #[rustfmt::skip]
 const ENDINGS: &[(&str, usize)] = &[
-    ("ei", 1), ("ou", 1), ("r", 1), ("ia", 3), ("iam", 3),
+    ("ei", 1), ("ou", 1), ("r", 1), ("ns", 1), ("im", 1), ("um", 1),
+    ("l", 1), ("z", 1), ("i", 1), ("u", 1),
 ];
 
 /// The word's spelling without its ending, as a string (for the -mente rule).
@@ -328,19 +362,22 @@ fn stress(w: &[char], phones: &[Phone]) -> Option<usize> {
     let last = nuclei.len() - 1;
     let text = word_string(w);
 
-    // -mente keeps the stress of the stem and adds its own syllables
-    if let Some(stem) = text.strip_suffix("mente") {
-        let stem_phones = scan(&stem.chars().collect::<Vec<char>>());
-        let stem_nuclei = stem_phones.iter().filter_map(|p| p.nucleus).count();
-        if stem_nuclei > 0 {
-            // the stem's own rule: an accent in the stem, else its penult
-            let accent = stem_phones.iter().find(|p| p.accented).and_then(|p| p.nucleus);
-            return Some(accent.unwrap_or(stem_nuclei - 1));
-        }
-    }
-
     // a word ending in a nasal vowel falls on it ("irmão", "manhã", "coração")
     let ends_nasal = phones.last().is_some_and(|p| p.nucleus.is_some() && p.nasal);
+
+    // -mente carries the stress: the "men" of the suffix is the stressed syllable
+    // ("rapidamente" [ʁapidaˈmɛ̃ntʃi]); a written accent in the stem still wins.
+    if let Some(stem) = text.strip_suffix("mente") {
+        let stem_phones = scan(&stem.chars().collect::<Vec<char>>());
+        let accent = stem_phones.iter().find(|p| p.accented).and_then(|p| p.nucleus);
+        let circumflex = stem.chars().any(|c| matches!(c, 'â' | 'ê' | 'ô'));
+        if let Some(n) = accent {
+            if !(circumflex && ends_nasal) {
+                return Some(n);
+            }
+        }
+        return Some(last.saturating_sub(1));
+    }
 
     // a written accent wins ("café", "único") — but a circumflex before a nasal ending marks the
     // nasalisation and not the stress ("bênção")
@@ -353,6 +390,13 @@ fn stress(w: &[char], phones: &[Phone]) -> Option<usize> {
 
     if ends_nasal {
         return Some(last);
+    }
+
+    // the imperfect -ia, -iam: the stress falls on the antepenult, or on the penult in the
+    // short words ("Maria" [maˈɾiɐ], "falava" [faˈlavɐ], "academia" [akaˈdɛmiɐ])
+    if text.ends_with("ia") || text.ends_with("iam") {
+        let back = if nuclei.len() == 3 { 2 } else { 3 };
+        return Some(last.saturating_sub(back - 1));
     }
 
     // the endings that carry their own stress
@@ -386,13 +430,23 @@ impl Parsed {
         // only when it is not stressed ("casa" [ˈkazɐ], "café" [kaˈfe])
         let closed = self.has_coda(n) || (self.word_final(n) && !stressed);
         let base = p.ipa.trim_end_matches(NASAL);
+        let final_vowel = self.last_sound(n);
         let mut out = match (base, stressed, closed) {
             // an unstressed /o/ at the end of a word rises to [u] ("copo", "sapato")
             ("o", false, true) => "u".to_string(),
             ("a", false, true) => "ɐ".to_string(),
+            // a word-final unstressed /e/ is [i], not [ɛ] ("fome" [ˈfomi], "dente" [ˈdẽntʃi])
+            ("e", false, true) if final_vowel => "i".to_string(),
             ("e", false, true) => "ɛ".to_string(),
-            // a stressed /a/ stays open ("mar", "calma"); a stressed /e o/ closes ("porta")
-            ("a", true, _) => "a".to_string(),
+            // a stressed /a/ stays open ("mar", "calma"); in a monosyllable it closes
+            // ("já" [ʒˈɐ], "lá" [ˈlɐ]); a stressed /e o/ closes ("porta")
+            ("a", true, _) => {
+                if final_vowel && self.syllables.len() == 1 {
+                    "ɐ".to_string()
+                } else {
+                    "a".to_string()
+                }
+            }
             ("e", true, true) => "ɛ".to_string(),
             ("o", true, true) => "ɔ".to_string(),
             (b, _, _) => b.to_string(),
@@ -427,6 +481,13 @@ impl Parsed {
     /// Whether the nucleus is the last one of the word.
     fn word_final(&self, n: usize) -> bool {
         self.syllables.last().and_then(|(_, v, _)| self.phones[*v].nucleus) == Some(n)
+    }
+
+    /// Whether the nucleus is the last *sound* of the word — the vowel itself, with no consonant
+    /// after it ("já" [ʒˈɐ], but "mar" [ˈmaʁ] keeps its open [a]).
+    fn last_sound(&self, n: usize) -> bool {
+        let Some(i) = self.phones.iter().position(|p| p.nucleus == Some(n)) else { return false };
+        i + 1 == self.phones.len()
     }
 
     fn segment(&self, p: &Phone) -> Segment {

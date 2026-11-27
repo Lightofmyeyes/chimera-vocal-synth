@@ -33,19 +33,19 @@ fn words(text: &str) -> String {
 
 #[test]
 fn letters_map_to_sounds() {
-    assert_eq!(w("chave"), "ʃ ˈa β ɛ");
+    assert_eq!(w("chave"), "ʃ ˈa v i");
     assert_eq!(w("filho"), "f ˈi ʎ u");
     assert_eq!(w("unha"), "ˈu ɲ ɐ");
     assert_eq!(w("guerra"), "g ˈɛ ʁ ɐ");
     assert_eq!(w("braço"), "b ɾ ˈa s u");
-    assert_eq!(w("quinze"), "k ˈi\u{303} n z ɛ");
+    assert_eq!(w("quinze"), "k ˈi\u{303} n z i");
     assert_eq!(w("homem"), "ˈo m ɛ̃ m");
 }
 
 #[test]
 fn the_three_rs() {
     // at the start of a word: the uvular fricative
-    assert_eq!(w("real"), "ʁ ˈe ɐ w");
+    assert_eq!(w("real"), "ʁ e ˈa w");
     // in the onset before a vowel: the tap
     assert_eq!(w("carioca"), "k a ɾ i ˈo k ɐ");
     assert_eq!(w("coração"), "k o ɾ a s ˈɐ̃w");
@@ -63,9 +63,9 @@ fn the_s_and_the_v() {
     assert_eq!(w("sapato"), "s a p ˈa t u");
     // the final s after a front vowel stays [s]
     assert_eq!(w("três"), "t ɾ ˈɛ s");
-    // [β] between vowels, [v] elsewhere
+    // [v] everywhere — Portuguese has no [β]
     assert_eq!(w("você"), "v o s ˈe");
-    assert_eq!(w("Brasil"), "b ɾ ˈa z i w");
+    assert_eq!(w("Brasil"), "b ɾ a z ˈi w");
 }
 
 #[test]
@@ -92,7 +92,7 @@ fn the_nasal_diphthongs_are_one_nucleus() {
     assert_eq!(w("coração"), "k o ɾ a s ˈɐ̃w");
     // a vowel before a nasal in its coda is nasalised
     assert_eq!(w("homem"), "ˈo m ɛ̃ m");
-    assert_eq!(w("quinze"), "k ˈi\u{303} n z ɛ");
+    assert_eq!(w("quinze"), "k ˈi\u{303} n z i");
 }
 
 #[test]
@@ -107,11 +107,82 @@ fn the_stress_rules() {
     assert_eq!(w("casa"), "k ˈa z ɐ");
     assert_eq!(w("Português"), "p u ʁ t u g ˈɛ s");
     // the endings that carry their own stress
-    assert_eq!(w("falou"), "f a l o ˈu");
-    assert_eq!(w("falei"), "f a l e ˈi");
+    assert_eq!(w("falou"), "f a l ˈow");
+    assert_eq!(w("falei"), "f a l ˈej");
     assert_eq!(w("falaria"), "f a l ˈa ɾ i ɐ");
-    // -mente keeps the stress of the stem
-    assert_eq!(w("rapidamente"), "ʁ a p i d ˈa m ɛ̃ n tʃ i");
+    // -mente carries the stress
+    assert_eq!(w("rapidamente"), "ʁ a p i d a m ˈɛ̃ n tʃ i");
+}
+
+// ------------------------------------------------------- the rules, one word each
+//
+// Every rule the native ear confirmed, held to the IPA it agreed with.
+
+#[test]
+fn the_v_is_v_everywhere() {
+    // Portuguese keeps [v] everywhere; the [β] of the Spanish b/v is not ours
+    assert_eq!(w("nova"), "n ˈo v ɐ");
+    assert_eq!(w("chave"), "ʃ ˈa v i");
+}
+
+#[test]
+fn the_palatal_affricates_change_before_i_only() {
+    // before [i] — the letter "i" and the word-final unstressed "e"
+    assert_eq!(w("noite"), "n ˈoj tʃ i");
+    assert_eq!(w("tarde"), "t ˈa ʁ dʒ i");
+    // before a sounded [e ɛ] the plain [t] and [d] stay
+    assert_eq!(w("tempo"), "t ˈɛ\u{303} m p u");
+    assert_eq!(w("tela"), "t ˈe l ɐ");
+}
+
+#[test]
+fn the_word_final_unstressed_e_is_i() {
+    assert_eq!(w("fome"), "f ˈo m i");
+    assert_eq!(w("dente"), "d ˈɛ\u{303} n tʃ i");
+}
+
+#[test]
+fn the_coda_l_is_w() {
+    assert_eq!(w("alto"), "ˈa w t u");
+    assert_eq!(w("calma"), "k ˈa w m ɐ");
+}
+
+#[test]
+fn the_final_s_is_s() {
+    // before a pause it is [s]; [z] belongs before a vowel across a word boundary
+    assert_eq!(w("casas"), "k ˈa z ɐ s");
+}
+
+#[test]
+fn the_oxytone_endings_fall_on_the_last_syllable() {
+    assert_eq!(w("Brasil"), "b ɾ a z ˈi w");
+    assert_eq!(w("feliz"), "f e l ˈi z");
+    assert_eq!(w("aqui"), "a k ˈi");
+    assert_eq!(w("comum"), "k o m ˈu\u{303} m");
+}
+
+#[test]
+fn the_ia_ending_falls_on_the_right_syllable() {
+    assert_eq!(w("Maria"), "m a ɾ ˈi ɐ");
+    assert_eq!(w("academia"), "a k a d ˈe m i ɐ");
+    assert_eq!(w("falaria"), "f a l ˈa ɾ i ɐ");
+}
+
+#[test]
+fn the_mente_carries_the_stress() {
+    assert_eq!(w("rapidamente"), "ʁ a p i d a m ˈɛ\u{303} n tʃ i");
+}
+
+#[test]
+fn the_plain_diphthongs_are_one_nucleus() {
+    assert_eq!(w("pai"), "p ˈaj");
+    assert_eq!(w("meu"), "m ˈew");
+    assert_eq!(w("coisa"), "k ˈoj z ɐ");
+}
+
+#[test]
+fn a_monosyllabic_stressed_a_closes() {
+    assert_eq!(w("já"), "ʒ ˈɐ");
 }
 
 #[test]
