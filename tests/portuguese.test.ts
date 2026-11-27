@@ -6,13 +6,13 @@ import { describe, expect, test } from "bun:test";
 import { initEngine } from "./harness.ts";
 
 await initEngine();
-const { portuguesePhrases, lyricsToSyllables, planPhrases } = await import("../src/wasm/engine.ts");
+const { phrases: phrasesIn, lyricsToSyllables, planPhrases } = await import("../src/wasm/engine.ts");
 const { wordSpans } = await import("../src/ui/words.ts");
 const male = { female: 0, child: 0 };
 
 describe("Portuguese", () => {
   test("text becomes phrases with Brazilian sounds and stress", () => {
-    const phrases = portuguesePhrases("Bom dia! Como você está?");
+    const phrases = phrasesIn("Bom dia! Como você está?", "pt");
     expect(phrases.length).toBe(2);
     expect(phrases[0].segments.map((s) => s.ipa).join("")).toBe("bɔ̃mdʒiɐ");
     expect(phrases[1].segments.filter((s) => s.stress === 1).map((s) => s.ipa)).toEqual(["o", "e", "a"]);
@@ -20,17 +20,17 @@ describe("Portuguese", () => {
   });
 
   test("the three r's and the nasal diphthong", () => {
-    expect(portuguesePhrases("Português")[0].segments.map((s) => s.ipa)).toEqual([
+    expect(phrasesIn("Português", "pt")[0].segments.map((s) => s.ipa)).toEqual([
       "p", "u", "ʁ", "t", "u", "g", "ɛ", "s",
     ]);
-    expect(portuguesePhrases("pão")[0].segments.map((s) => s.ipa)).toEqual(["p", "ɐ̃w"]);
-    expect(portuguesePhrases("carioca")[0].segments.map((s) => s.ipa)).toEqual([
+    expect(phrasesIn("pão", "pt")[0].segments.map((s) => s.ipa)).toEqual(["p", "ɐ̃w"]);
+    expect(phrasesIn("carioca", "pt")[0].segments.map((s) => s.ipa)).toEqual([
       "k", "a", "ɾ", "i", "o", "k", "ɐ",
     ]);
   });
 
   test("each word gets its span in the plan", () => {
-    const phrases = portuguesePhrases("Bom dia. Como você está?");
+    const phrases = phrasesIn("Bom dia. Como você está?", "pt");
     const plan = planPhrases(phrases, { body: male, t0: 0 });
     const words = wordSpans(phrases, plan);
     expect(words.map((w) => w.text)).toEqual(["Bom", "dia", "Como", "você", "está"]);
