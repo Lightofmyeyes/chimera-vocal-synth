@@ -196,6 +196,46 @@ wrote her verdict on it. Seven rules changed with it, and each one now has a tes
 | *Maria*, *academia* and *Brasil* fell on the wrong syllable | the oxytone endings and the -ia ending |
 | *rapidamente* stressed the stem | -mente carries the stress |
 
+## The judge: how intelligible the Portuguese singing is (measured 27 November 2026)
+
+The scramble test (`tools/asr/scramble.py`) now judges Portuguese too: Whisper (sherpa-onnx,
+multilingual base, `language=pt`), since SenseVoice has no Portuguese model. On 8 scrambles x 2
+voices, with five lines of our own:
+
+| | real lyric | scrambled |
+|---|---|---|
+| male | 73.7% word error | 107.2% |
+| female | 81.6% | 107.6% |
+
+**That number is high, and the controls say where the loss is.** English through the same judge
+and the same engine is 39.0 / 63.4%; Portuguese **spoken**, not sung, is 94.7 / 107.9% -- worse than
+singing it. And rendering the front end's own IPA through `render speech` instead of
+`render portuguese` is heard far better (whisper hears "para você, ... português" where the
+Portuguese path gives "avesso ... por tu gás"). So the loss is in the voice and in the phrase plan
+the Portuguese path uses, **not** in the reading: the front end writes the IPA it says it writes.
+
+**Where the code and this recipe still differ.** Comparing every IPA example above with what
+`chimera syllables <word> pt` gives, these are the real ones (the recipe is the law; the code is
+what runs):
+
+| word | the recipe says | the code gives |
+|---|---|---|
+| `você` | [voˈsɛ] | [voˈse] |
+| `novo` | [ˈnovɐ] | [ˈnovu] |
+| `Português` | [poʁtuˈɡeʃ] | [puʁtuˈgɛs] |
+| `coração` | [koɾɐˈsɐ̃w̃] | [koɾaˈsɐ̃w] |
+| `asas` | [ˈazɐz] | [ˈazɐs] |
+| `água` | [ˈaɡwa] | [ʔaku̠a] |
+| `lá` | [ˈlɐ] | [la] |
+| `pôr` | [poʁ] | [ˈpɔʁ] |
+| `quinze` | [ˈkĩzɪ] | [ˈkĩnzi] |
+| `homem` | [oˈmẽj̃] | [ˈomɛ̃m] |
+| `academia` | [akaˈdɛmiɐ] | [akaˈdemiɐ] |
+
+The [ɛ] and [ɔ] of the unstressed vowels, the [ɾ] that ends a word, the nasal mark, the initial
+[ʁ] and "Português", the final vowel and the /w/ of "água" are the open questions. Each one is
+now a probe (`tools/asr/probes/pt_*.txt`), so the next ear has a line to listen to.
+
 ## The known approximations
 
 Three things this front end still reads by rule where a speaker would vary:
